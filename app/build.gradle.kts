@@ -83,5 +83,15 @@ dependencies {
     ksp(libs.androidx.hiltCompiler)
     implementation(libs.google.hiltAndroid)
     implementation(libs.androidx.hilt.navigation.compose)
-//    implementation(libs.androidx.hiltWork)
+
+    // Retrofit
+    implementation(libs.retrofit.core)
+    implementation(libs.retrofit.converter.gson)
+    implementation(libs.okhttp.core)
+    implementation(libs.okhttp.logging.interceptor)
+
+    // Preferences Datastore
+    implementation(libs.datastore.preferences)
+
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.1")
 }

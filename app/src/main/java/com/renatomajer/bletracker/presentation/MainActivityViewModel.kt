@@ -6,6 +6,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.renatomajer.bletracker.data.ConnectionState
+import com.renatomajer.bletracker.data.DefaultRepository
 import com.renatomajer.bletracker.data.ReceiveManager
 import com.renatomajer.bletracker.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -14,7 +15,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MainActivityViewModel @Inject constructor(
-    private val receiveManager: ReceiveManager
+    private val receiveManager: ReceiveManager,
+    private val defaultRepository: DefaultRepository
 ) : ViewModel() {
 
     var initializingMessage by mutableStateOf<String?>(null)

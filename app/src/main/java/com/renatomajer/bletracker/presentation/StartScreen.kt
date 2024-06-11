@@ -8,6 +8,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -15,13 +18,27 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 
 @Composable
 fun StartScreen(
     modifier: Modifier = Modifier,
-    navController: NavController
+    navController: NavController,
+    viewModel: StartScreenViewModel = hiltViewModel()
 ) {
+
+    val canNavigate by viewModel.canNavigate.collectAsState()
+
+    LaunchedEffect(key1 = canNavigate) {
+        if (canNavigate) {
+            navController.navigate(Screen.MainScreen.route) {
+                popUpTo(Screen.StartScreen.route) {
+                    inclusive = true
+                }
+            }
+        }
+    }
 
     Box(
         modifier = modifier.fillMaxSize(),
@@ -33,11 +50,7 @@ fun StartScreen(
                 .clip(CircleShape)
                 .background(Color.Blue, CircleShape)
                 .clickable {
-                    navController.navigate(Screen.MainScreen.route) {
-                        popUpTo(Screen.StartScreen.route) {
-                            inclusive = true
-                        }
-                    }
+                    viewModel.getToken()
                 },
             contentAlignment = Alignment.Center
         ) {

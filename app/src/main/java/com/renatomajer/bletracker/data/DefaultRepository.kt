@@ -1,0 +1,69 @@
+package com.renatomajer.bletracker.data
+
+import com.renatomajer.bletracker.data.local.CredentialsDataStore
+import com.renatomajer.bletracker.data.remote.ApiService
+import com.renatomajer.bletracker.data.remote.Result
+import com.renatomajer.bletracker.data.remote.dto.LoginRequest
+import com.renatomajer.bletracker.data.remote.dto.TokenResponse
+import com.renatomajer.bletracker.data.remote.safeResponse
+import com.renatomajer.bletracker.util.Resource
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
+import javax.inject.Inject
+import javax.inject.Singleton
+
+@Singleton
+class DefaultRepository @Inject constructor(
+    private val api: ApiService,
+    private val credentialsDataStore: CredentialsDataStore
+) {
+
+    val username = credentialsDataStore.username
+
+    val password = credentialsDataStore.password
+
+    val token = credentialsDataStore.token
+
+    val refreshToken = credentialsDataStore.refreshToken
+
+    suspend fun getToken(username: String, password: String): Flow<Resource<TokenResponse>> = flow {
+        emit(Resource.Loading())
+
+        val loginRequest = LoginRequest(username = username, password = password)
+
+        val result = safeResponse {
+            api.getTokenForUsernameAndPassword(loginRequest)
+        }
+
+        when (result) {
+            is Result.Success -> {
+                emit(Resource.Success(data = result.data))
+            }
+
+            is Result.Error -> {
+                emit(
+                    Resource.Error(
+                        errorMessage = result.error.message ?: "",
+                        error = result.error
+                    )
+                )
+            }
+        }
+    }
+
+    suspend fun storeUsername(username: String) {
+        credentialsDataStore.setUsername(username)
+    }
+
+    suspend fun storePassword(password: String) {
+        credentialsDataStore.setPassword(password)
+    }
+
+    suspend fun storeToken(token: String) {
+        credentialsDataStore.setToken(token)
+    }
+
+    suspend fun storeRefreshToken(refreshToken: String) {
+        credentialsDataStore.setRefreshToken(refreshToken)
+    }
+}
