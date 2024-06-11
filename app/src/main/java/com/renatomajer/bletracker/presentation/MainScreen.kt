@@ -24,9 +24,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.renatomajer.bletracker.data.ConnectionState
@@ -37,7 +37,7 @@ import com.renatomajer.bletracker.presentation.permissions.SystemBroadcastReceiv
 @Composable
 fun MainScreen(
     modifier: Modifier = Modifier,
-    viewModel: MainActivityViewModel, // TODO: replace this with dependency injection
+    viewModel: MainActivityViewModel = hiltViewModel(),
     onBluetoothStateChanged: () -> Unit
 ) {
 

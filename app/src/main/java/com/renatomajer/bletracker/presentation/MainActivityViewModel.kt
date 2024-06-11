@@ -1,32 +1,21 @@
 package com.renatomajer.bletracker.presentation
 
-import android.app.Application
-import android.bluetooth.BluetoothAdapter
-import android.bluetooth.BluetoothManager
-import android.content.Context
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.renatomajer.bletracker.data.ConnectionState
 import com.renatomajer.bletracker.data.ReceiveManager
-import com.renatomajer.bletracker.data.ble.BleReceiveManager
 import com.renatomajer.bletracker.util.Resource
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class MainActivityViewModel(application: Application) : AndroidViewModel(application) {
-
-    private val manager =
-        application.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
-    private val bluetoothAdapter = manager.adapter
-
-
-    private val receiveManager: ReceiveManager = BleReceiveManager(
-        context = application.applicationContext,
-        bluetoothAdapter = bluetoothAdapter
-    )
+@HiltViewModel
+class MainActivityViewModel @Inject constructor(
+    private val receiveManager: ReceiveManager
+) : ViewModel() {
 
     var initializingMessage by mutableStateOf<String?>(null)
         private set

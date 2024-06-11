@@ -20,12 +20,13 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 private const val DEVICE_NAME = "esp32_mrkvaj"
 private const val DEVICE_ADDRESS = "4C:11:AE:DE:8D:56"
 
 @SuppressLint("MissingPermission")
-class BleReceiveManager(
+class BleReceiveManager @Inject constructor(
     private val bluetoothAdapter: BluetoothAdapter,
     private val context: Context
 ) : ReceiveManager {
@@ -47,7 +48,10 @@ class BleReceiveManager(
 
     private val scanCallback = object : ScanCallback() {
         override fun onScanResult(callbackType: Int, result: ScanResult) {
-            Log.d("BleReceiveManager", "Pronađen uređaj: ${result.device.address}, ${result.device.name}")
+            Log.d(
+                "BleReceiveManager",
+                "Pronađen uređaj: ${result.device.address}, ${result.device.name}"
+            )
 
 //            coroutineScope.launch {
 //                data.emit(Resource.Loading(message = "${result.device.name}"))
@@ -154,7 +158,7 @@ class BleReceiveManager(
             data.emit(Resource.Loading(message = "Scanning Ble devices..."))
         }
 
-        if (bluetoothAdapter == null || !bluetoothAdapter.isEnabled) {
+        if (!bluetoothAdapter.isEnabled) {
             coroutineScope.launch {
                 data.emit(Resource.Error(errorMessage = "Bluetooth nije dostupan ili nije uključen"))
             }

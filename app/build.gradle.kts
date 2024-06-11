@@ -42,10 +42,10 @@ android {
         compose = true
     }
     hilt {
-        enableAggregatingTask = true
+        enableAggregatingTask = false
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.1"
+        kotlinCompilerExtensionVersion = "1.5.11"
     }
     packaging {
         resources {
@@ -82,4 +82,6 @@ dependencies {
     ksp(libs.google.hiltCompiler)
     ksp(libs.androidx.hiltCompiler)
     implementation(libs.google.hiltAndroid)
+    implementation(libs.androidx.hilt.navigation.compose)
+//    implementation(libs.androidx.hiltWork)
 }

@@ -18,7 +18,10 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 
 @Composable
-fun StartScreen(modifier: Modifier = Modifier, navController: NavController) {
+fun StartScreen(
+    modifier: Modifier = Modifier,
+    navController: NavController
+) {
 
     Box(
         modifier = modifier.fillMaxSize(),

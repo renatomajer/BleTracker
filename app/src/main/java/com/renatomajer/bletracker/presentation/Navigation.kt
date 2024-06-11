@@ -1,16 +1,12 @@
 package com.renatomajer.bletracker.presentation
 
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.navigation.NavGraph
-import androidx.navigation.NavHost
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 
 @Composable
 fun Navigation(
-    viewModel: MainActivityViewModel,
     onBluetoothStateChanged: () -> Unit
 ) {
     val navController = rememberNavController()
@@ -23,12 +19,10 @@ fun Navigation(
 
         composable(route = Screen.MainScreen.route) {
             MainScreen(
-                onBluetoothStateChanged = onBluetoothStateChanged,
-                viewModel = viewModel
+                onBluetoothStateChanged = onBluetoothStateChanged
             )
         }
     }
-
 }
 
 sealed class Screen(val route: String) {
