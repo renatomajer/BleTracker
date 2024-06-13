@@ -1,16 +1,19 @@
-package com.renatomajer.bletracker.presentation
+package com.renatomajer.bletracker.presentation.main
 
 import android.bluetooth.BluetoothAdapter
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -29,7 +32,14 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
+import com.google.android.gms.maps.model.CameraPosition
+import com.google.android.gms.maps.model.LatLng
+import com.google.maps.android.compose.GoogleMap
+import com.google.maps.android.compose.Marker
+import com.google.maps.android.compose.MarkerState
+import com.google.maps.android.compose.rememberCameraPositionState
 import com.renatomajer.bletracker.data.ConnectionState
+import com.renatomajer.bletracker.presentation.MainActivityViewModel
 import com.renatomajer.bletracker.presentation.permissions.PermissionsUtils
 import com.renatomajer.bletracker.presentation.permissions.SystemBroadcastReceiver
 
@@ -56,23 +66,28 @@ fun MainScreen(
 
     val bleConnectionState = viewModel.connectionState
 
+    LaunchedEffect(key1 = true) {
+        // Fetch stealing state
+        viewModel.startPolling()
+    }
+
     DisposableEffect(key1 = lifecycleOwner, effect = {
         val observer = LifecycleEventObserver { _, event ->
 
             if (event == Lifecycle.Event.ON_START) {
                 permissionState.launchMultiplePermissionRequest()
-                if (permissionState.allPermissionsGranted && bleConnectionState == ConnectionState.Disconnected) {
-                    // Case when the user already had the connection and minimizes the app -> ON_STOP the device will disconnect
-                    // and when the user reopens the app -> ON_START gets fired, we will reconnect
-                    viewModel.reconnect()
-                }
+//                if (permissionState.allPermissionsGranted && bleConnectionState == ConnectionState.Disconnected) {
+//                    // Case when the user already had the connection and minimizes the app -> ON_STOP the device will disconnect
+//                    // and when the user reopens the app -> ON_START gets fired, we will reconnect
+//                    viewModel.reconnect()
+//                }
             }
 
             if (event == Lifecycle.Event.ON_STOP) {
                 // This closes the connection when the user closes the app
-                if (bleConnectionState == ConnectionState.Connected) {
-                    viewModel.disconnect()
-                }
+//                if (bleConnectionState == ConnectionState.Connected) {
+//                    viewModel.disconnect()
+//                }
             }
         }
 
@@ -83,18 +98,20 @@ fun MainScreen(
         }
     })
 
-    LaunchedEffect(key1 = permissionState.allPermissionsGranted) {
-        if (permissionState.allPermissionsGranted) {
-            if (bleConnectionState == ConnectionState.Uninitialized) {
-                viewModel.initializeConnection()
-            }
-        }
-    }
+//    LaunchedEffect(key1 = permissionState.allPermissionsGranted) {
+//        if (permissionState.allPermissionsGranted) {
+//            if (bleConnectionState == ConnectionState.Uninitialized) {
+//                viewModel.initializeConnection()
+//            }
+//        }
+//    }
 
-    Box(
+    Column(
         modifier = Modifier
-            .fillMaxSize(),
-        contentAlignment = Alignment.Center
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState()),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
     ) {
         Column(
             modifier = Modifier
@@ -168,7 +185,61 @@ fun MainScreen(
                 }) {
                     Text("Initialize again")
                 }
+            } else if (bleConnectionState == ConnectionState.Uninitialized) {
+                Button(
+                    onClick = {
+                        if (permissionState.allPermissionsGranted) {
+                            viewModel.initializeConnection()
+                        }
+                    }
+                ) {
+                    Text("Connect")
+                }
             }
+        }
+
+
+        if (viewModel.isStealing) {
+            Text(text = "Stealing in progress...")
+
+            Spacer(modifier = Modifier.height(100.dp))
+
+            val telemetry = viewModel.telemetry
+            val values = telemetry?.location?.getOrNull(0)?.value?.split(", ")
+
+            //TODO: remove default values
+            val lat = values?.getOrNull(0)?.toDouble() ?: 45.8293
+            val lon = values?.getOrNull(1)?.toDouble() ?: 15.9793
+
+            // Show map
+            if (lat != null && lon != null) {
+
+                val bikeLocation = LatLng(lat, lon)
+                val cameraPositionState = rememberCameraPositionState {
+                    position = CameraPosition.fromLatLngZoom(bikeLocation, 10f)
+                }
+                GoogleMap(
+                    modifier = Modifier
+                        .height(300.dp)
+                        .fillMaxWidth(),
+                    cameraPositionState = cameraPositionState
+                ) {
+                    Marker(
+                        state = MarkerState(position = bikeLocation),
+                        title = "Bike location",
+                        snippet = "Marker on bike location"
+                    )
+                }
+            }
+
+            Button(
+                onClick = {
+                    viewModel.stopPolling()
+                })
+            {
+                Text(text = "Cancel stealing notification")
+            }
+
         }
     }
 

@@ -40,7 +40,7 @@ object NetworkModule {
             .addInterceptor(HttpLoggingInterceptor().apply {
                 level = HttpLoggingInterceptor.Level.BODY
             })
-            .connectTimeout(10.seconds.toJavaDuration()).build()
+            .connectTimeout(20.seconds.toJavaDuration()).build()
     }
 
     @Provides

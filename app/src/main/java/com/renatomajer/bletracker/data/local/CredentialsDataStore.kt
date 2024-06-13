@@ -24,6 +24,7 @@ class CredentialsDataStore @Inject constructor(
         val PASSWORD_KEY = stringPreferencesKey("password")
         val TOKEN_KEY = stringPreferencesKey("token")
         val REFRESH_TOKEN_KEY = stringPreferencesKey("refresh_token")
+        val DEVICE_ID_KEY = stringPreferencesKey("device_id")
     }
 
     val username: Flow<String?> = context.dataStore.data
@@ -44,6 +45,11 @@ class CredentialsDataStore @Inject constructor(
     val refreshToken: Flow<String?> = context.dataStore.data
         .map { preferences ->
             preferences[REFRESH_TOKEN_KEY]
+        }
+
+    val deviceId: Flow<String?> = context.dataStore.data
+        .map { preferences ->
+            preferences[DEVICE_ID_KEY]
         }
 
     suspend fun setUsername(username: String) {
@@ -67,6 +73,12 @@ class CredentialsDataStore @Inject constructor(
     suspend fun setRefreshToken(refreshToken: String) {
         context.dataStore.edit { credentials ->
             credentials[REFRESH_TOKEN_KEY] = refreshToken
+        }
+    }
+
+    suspend fun setDeviceId(deviceId: String) {
+        context.dataStore.edit { credentials ->
+            credentials[DEVICE_ID_KEY] = deviceId
         }
     }
 }

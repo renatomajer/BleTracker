@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.jetbrains.kotlin.android)
     alias(libs.plugins.hilt.android)
     id("com.google.devtools.ksp") version "1.9.23-1.0.20" apply true
+    //id("com.google.gms.google-services") version "4.3.15" apply true
 }
 
 android {
@@ -94,4 +95,10 @@ dependencies {
     implementation(libs.datastore.preferences)
 
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.1")
+
+    // Google Maps
+    implementation("com.google.maps.android:maps-compose:4.4.1")
+
+    // JWT
+    implementation("io.github.nefilim.kjwt:kjwt-core:0.9.0")
 }

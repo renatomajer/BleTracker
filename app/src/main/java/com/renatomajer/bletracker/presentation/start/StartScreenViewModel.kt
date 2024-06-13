@@ -1,11 +1,14 @@
-package com.renatomajer.bletracker.presentation
+package com.renatomajer.bletracker.presentation.start
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import arrow.core.Either
+import arrow.core.getOrElse
 import com.renatomajer.bletracker.data.DefaultRepository
 import com.renatomajer.bletracker.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
+import io.github.nefilim.kjwt.JWT
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -21,7 +24,7 @@ class StartScreenViewModel @Inject constructor(
     private val _canNavigate: MutableStateFlow<Boolean> = MutableStateFlow(false)
     val canNavigate: StateFlow<Boolean> = _canNavigate.asStateFlow()
 
-    fun getToken(username: String = "kristijan.horvat@fer.hr", password: String = "Mrkvaj123") {
+    fun getToken(username: String = "renato.majer@fer.hr", password: String = "Renato123") {
         viewModelScope.launch {
             defaultRepository.getToken(username = username, password = password)
                 .collect { resource ->
@@ -31,8 +34,17 @@ class StartScreenViewModel @Inject constructor(
 
                         is Resource.Success -> {
                             Log.d("debug_log", resource.data.toString())
+
+                            val token = resource.data.token
+
+                            val customerId = parseJwtToCustomerId(token)
+
+                            customerId?.let {
+                                defaultRepository.getDeviceId(customerId)
+                            }
+
                             defaultRepository.storeRefreshToken(resource.data.refreshToken)
-                            defaultRepository.storeToken(resource.data.token)
+                            defaultRepository.storeToken(token)
                             _canNavigate.value = true
                         }
 
@@ -46,6 +58,20 @@ class StartScreenViewModel @Inject constructor(
                         }
                     }
                 }
+        }
+    }
+
+    private fun parseJwtToCustomerId(token: String): String? {
+        return when (val result = JWT.decode(token)) {
+            is Either.Right -> {
+                val customerId = result.value.jwt.claimValue("customerId").getOrElse { null }
+                return customerId
+            }
+
+            is Either.Left -> {
+                Log.e("JWT", "Error decoding JWT: ${result.value}")
+                null
+            }
         }
     }
 }

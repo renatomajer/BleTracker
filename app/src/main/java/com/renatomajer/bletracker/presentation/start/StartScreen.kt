@@ -1,4 +1,4 @@
-package com.renatomajer.bletracker.presentation
+package com.renatomajer.bletracker.presentation.start
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.renatomajer.bletracker.presentation.Screen
 
 @Composable
 fun StartScreen(
