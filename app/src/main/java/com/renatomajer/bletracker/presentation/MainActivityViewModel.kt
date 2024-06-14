@@ -42,7 +42,7 @@ class MainActivityViewModel @Inject constructor(
     var isStealing by mutableStateOf<Boolean>(false)
         private set
 
-    var pollingDelay = 10000L
+    var pollingDelay = 5000L
 
     private fun listenForChanges() {
         viewModelScope.launch {
@@ -106,7 +106,7 @@ class MainActivityViewModel @Inject constructor(
                                 isStealing = false
 //                                pollingJob?.cancel()
 //                                pollingJob = null
-                                pollingDelay = 10000L
+                                pollingDelay = 5000L
                             }
                         }
 

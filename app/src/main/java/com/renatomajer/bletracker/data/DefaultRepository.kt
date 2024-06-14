@@ -1,5 +1,6 @@
 package com.renatomajer.bletracker.data
 
+import android.util.Log
 import com.renatomajer.bletracker.data.local.CredentialsDataStore
 import com.renatomajer.bletracker.data.remote.ApiService
 import com.renatomajer.bletracker.data.remote.Result
@@ -106,14 +107,22 @@ class DefaultRepository @Inject constructor(
         val deviceId = deviceId.first()
 
         if (storedToken != null && deviceId != null) {
-            api.stopStealing(
-                token = "Bearer $storedToken",
-                body = StopStealing(
-                    method = "stopGPS",
-                    params = Params(false)
-                ),
-                deviceId = deviceId
-            )
+            val result = safeResponse {
+                api.stopStealing(
+                    token = "Bearer $storedToken",
+                    body = StopStealing(
+                        method = "stopGPS",
+                        params = Params(false)
+                    ),
+                    deviceId = deviceId
+                )
+            }
+
+            if (result is Result.Error) {
+                // Do nothing
+            } else if (result is Result.Success) {
+                Log.d("debug_log", "RPC success")
+            }
         }
     }
 

@@ -1,6 +1,7 @@
 package com.renatomajer.bletracker.presentation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -9,11 +10,16 @@ import com.renatomajer.bletracker.presentation.start.StartScreen
 
 @Composable
 fun Navigation(
+    modifier: Modifier,
     onBluetoothStateChanged: () -> Unit
 ) {
     val navController = rememberNavController()
 
-    NavHost(navController = navController, startDestination = Screen.StartScreen.route) {
+    NavHost(
+        modifier = modifier,
+        navController = navController,
+        startDestination = Screen.StartScreen.route
+    ) {
 
         composable(route = Screen.StartScreen.route) {
             StartScreen(navController = navController)

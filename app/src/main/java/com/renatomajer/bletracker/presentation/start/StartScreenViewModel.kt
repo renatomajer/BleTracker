@@ -1,6 +1,7 @@
 package com.renatomajer.bletracker.presentation.start
 
 import android.util.Log
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import arrow.core.Either
@@ -24,7 +25,14 @@ class StartScreenViewModel @Inject constructor(
     private val _canNavigate: MutableStateFlow<Boolean> = MutableStateFlow(false)
     val canNavigate: StateFlow<Boolean> = _canNavigate.asStateFlow()
 
+    var wrongCredentials = mutableStateOf(false)
+        private set
+
+    var isLoggingIn = mutableStateOf(false)
+        private set
+
     fun getToken(username: String = "renato.majer@fer.hr", password: String = "Renato123") {
+        isLoggingIn.value = true
         viewModelScope.launch {
             defaultRepository.getToken(username = username, password = password)
                 .collect { resource ->
@@ -45,6 +53,8 @@ class StartScreenViewModel @Inject constructor(
 
                             defaultRepository.storeRefreshToken(resource.data.refreshToken)
                             defaultRepository.storeToken(token)
+                            wrongCredentials.value = false
+                            isLoggingIn.value = false
                             _canNavigate.value = true
                         }
 
@@ -52,6 +62,8 @@ class StartScreenViewModel @Inject constructor(
                             resource.error?.let {
                                 if (it is HttpException && it.response()?.code() == 401) {
                                     Log.d("debug_log", "Wrong credentials")
+                                    isLoggingIn.value = false
+                                    wrongCredentials.value = true
                                     _canNavigate.value = false
                                 }
                             }
